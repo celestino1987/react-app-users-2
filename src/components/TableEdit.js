@@ -24,7 +24,7 @@ export default function StickyHeadTable() {
   const users = useUsers()   
   const classes = useStyles();
   const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -36,6 +36,7 @@ export default function StickyHeadTable() {
   };
 
   return (
+    <div>
     <Paper className={classes.root}>
       <TableContainer className={classes.container}>
         <Table stickyHeader aria-label="sticky table">
@@ -48,7 +49,7 @@ export default function StickyHeadTable() {
             </TableRow>
           </TableHead>
           <TableBody>     
-                {users.data?.map(user => (
+                {users.data?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(user => (
                            
                   <TableRow  key={user.id}  >
                       <TableCell>{user.id}</TableCell>
@@ -63,14 +64,15 @@ export default function StickyHeadTable() {
         </Table>
       </TableContainer>
       <TablePagination
-        rowsPerPageOptions={[10, 25, 100]}
-        component="div"
-        count={setRowsPerPage.length}
+        rowsPerPageOptions={[5, 10, 15]}
+        component='div'
+        count={users.data?.length}
         rowsPerPage={rowsPerPage}
         page={page}
         onChangePage={handleChangePage}
         onChangeRowsPerPage={handleChangeRowsPerPage}
       />
     </Paper>
+    </div>
   );
 }
