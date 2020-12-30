@@ -1,4 +1,4 @@
-import React from 'react';
+import React ,{useState,useEffect} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Table from '@material-ui/core/Table';
@@ -10,6 +10,16 @@ import TablePagination from '@material-ui/core/TablePagination';
 import TableRow from '@material-ui/core/TableRow';
 import { useUsers } from '../hooks/useUsers';
 
+import {  useHistory } from "react-router-dom";
+
+import { ModalApp } from './ModalApp';
+import { getSort } from '../services/getSort';
+import { AddButton } from './AddButton';
+import { Button } from '@material-ui/core';
+import PersonAddIcon from '@material-ui/icons/PersonAdd';
+
+const ASC = 'asc';
+const DESC = 'desc'
 
 const useStyles = makeStyles({
   root: {
@@ -21,10 +31,27 @@ const useStyles = makeStyles({
 });
 
 export default function StickyHeadTable() {
+  const defaultState = {
+    users: [],
+    copyUsers: []
+}
+const [state, setState] = useState(defaultState)
+const [order, setOrder] = useState(ASC)
+const [isOpen, setOpenModal] = useState(false);
+const [selectedUser, setSelectedUser] = useState({})
+
+
+
   const users = useUsers()   
+  useEffect(() => {
+    setState({ users: users.data, copyUsers: users.data });
+
+}, [users.data])
   const classes = useStyles();
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
+
+  
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -35,6 +62,13 @@ export default function StickyHeadTable() {
     setPage(0);
   };
 
+
+  function sortColumn(column) {
+    setOrder(order === ASC ? DESC : ASC)
+    setState({...state, users: getSort(state.users,column, order)})
+    
+
+}
   return (
     <div>
     <Paper className={classes.root}>
@@ -42,20 +76,26 @@ export default function StickyHeadTable() {
         <Table stickyHeader aria-label="sticky table">
           <TableHead>
             <TableRow>
-              <TableCell>ID</TableCell>
-              <TableCell>Nombre</TableCell>
-              <TableCell>Apellido</TableCell>
-              <TableCell>Email</TableCell>
+              <TableCell className="cursor">ID</TableCell>
+              <TableCell className="cursor" onClick={() => sortColumn('first_name')} >Nombre</TableCell>
+              <TableCell className="cursor" onClick={() => sortColumn('last_name')} >Apellido</TableCell>
+              <TableCell className="cursor" onClick={() => sortColumn('email')} >Email</TableCell>
+            <TableCell>
+            <Button  onClick={() => {setOpenModal(true)}} ><PersonAddIcon></PersonAddIcon> </Button>
+            </TableCell>
+            <TableCell>
+            
+            </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>     
                 {users.data?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(user => (
                            
-                  <TableRow  key={user.id}  >
+                  <TableRow  className="cursor" key={user.id}  onClick={() => {setOpenModal(true); setSelectedUser(user)}}  >
                       <TableCell>{user.id}</TableCell>
-                      <TableCell>{user.email}</TableCell>
                       <TableCell>{user.first_name}</TableCell>
                       <TableCell>{user.last_name}</TableCell>                  
+                      <TableCell>{user.email}</TableCell>
                   </TableRow>
                   
               ))}
@@ -73,6 +113,8 @@ export default function StickyHeadTable() {
         onChangeRowsPerPage={handleChangeRowsPerPage}
       />
     </Paper>
+    <ModalApp isOpen={isOpen} selectedUser={selectedUser}></ModalApp>
     </div>
+
   );
 }
