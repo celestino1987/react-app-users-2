@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import { Button } from '@material-ui/core';
@@ -14,10 +14,15 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-
 export  function FormRegister({user = {}}) {
 
-  console.log(user);
+
+  const [disabledStatus, setDisabledStatus] = useState(true)
+  const [formUser, setFormUser] = useState(user)
+
+  const newDisabled =() => {
+    setDisabledStatus(!disabledStatus)
+   }
 
     const classes = useStyles();
 
@@ -28,12 +33,14 @@ export  function FormRegister({user = {}}) {
           <h3>{user && user.first_name ? 'Editar usuario' : 'Nuevo usuario' }</h3>
           <div> 
           <TextField
-            id="standard-full-width"
-            
-            value={user ? user.first_name : ''}
+            id="standard-full-width-name"
+            disabled={disabledStatus}
+            value={formUser ? formUser.first_name : ''}
             style={{ margin: 8 }}
             placeholder="Nombre:"
-            
+            onChange={e => {
+              setFormUser({...formUser, first_name: e.target.value})
+            }}
             fullWidth
             margin="normal"
             InputLabelProps={{
@@ -44,12 +51,14 @@ export  function FormRegister({user = {}}) {
 
             <div>
           <TextField
-            id="standard-full-width"
-           
-            value={user ? user.last_name : ''}
+            id="standard-full-width-last-name"
+            disabled={disabledStatus}
+            value={formUser ? formUser.last_name : ''}
             style={{ margin: 8 }}
             placeholder="Apellido:"
-            
+            onChange={e => {
+              setFormUser({...formUser, last_name: e.target.value})
+            }}
             fullWidth
             margin="normal"
             InputLabelProps={{
@@ -61,10 +70,13 @@ export  function FormRegister({user = {}}) {
             <div>
           <TextField
             id="standard-full-width"
-           
+            disabled={disabledStatus}
             style={{ margin: 8 }}
             placeholder="Email:"
-            value={user ? user.email : ''}
+            value={formUser ? formUser.email : ''}
+            onChange={e => {
+              setFormUser({...formUser, email: e.target.value})
+            }}
             fullWidth
             margin="normal"
             InputLabelProps={{
@@ -72,8 +84,13 @@ export  function FormRegister({user = {}}) {
             }}
             />
             </div>
-            <Button className="m-3">Guardar</Button>
+            <Button size="small">Guardar</Button>
+           
+            <Button type="submit" id="btn" size="small" onClick={newDisabled}>Editar</Button>
+
            </div> 
      
             )
+           
             }
+          

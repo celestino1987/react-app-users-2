@@ -81,7 +81,7 @@ const [selectedUser, setSelectedUser] = useState({})
               <TableCell className="cursor" onClick={() => sortColumn('last_name')} >Apellido</TableCell>
               <TableCell className="cursor" onClick={() => sortColumn('email')} >Email</TableCell>
             <TableCell>
-            <Button  onClick={() => {setOpenModal(true)}} ><PersonAddIcon></PersonAddIcon> </Button>
+            <Button  onClick={() => {setOpenModal(true); setSelectedUser(null)}} ><PersonAddIcon></PersonAddIcon> </Button>
             </TableCell>
             <TableCell>
             
@@ -113,7 +113,7 @@ const [selectedUser, setSelectedUser] = useState({})
         onChangeRowsPerPage={handleChangeRowsPerPage}
       />
     </Paper>
-    <ModalApp isOpen={isOpen} selectedUser={selectedUser}></ModalApp>
+    <ModalApp isOpen={isOpen} setOpenModal={setOpenModal} selectedUser={selectedUser}></ModalApp>
     </div>
 
   );

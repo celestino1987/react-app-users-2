@@ -1,25 +1,28 @@
 import React, { useState } from 'react'
 import Modal from 'react-modal';
-import { AddButton } from './AddButton';
+import   CloseOutlinedIcon from '@material-ui/icons/CloseOutlined';
 import { FormRegister } from './FormRegister';
+import { Button } from '@material-ui/core';
+
+
 
 Modal.setAppElement('#root');
-export const ModalApp = ({isOpen, selectedUser = {}}) => {
 
-    const closeModal = () => {
-    isOpen = false;
-    }
+export const ModalApp = ({isOpen, setOpenModal, selectedUser = {}}) => {
 
     return (
-        <>
+        <> 
+         
         <Modal   
+        
             isOpen={isOpen}
             closeTimeoutMS={200}
-            onRequestClose={closeModal}
+           setOpenModal={setOpenModal}
             className="modal"
             overlayClassName="modal-fondo"     
              
-        >
+        > 
+           <Button onClick={() => {setOpenModal(false)}}><CloseOutlinedIcon  /></Button>
             <FormRegister user={selectedUser}></FormRegister>
         </Modal>
        
