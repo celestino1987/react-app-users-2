@@ -7,6 +7,7 @@ import Swal from 'sweetalert2';
 import { useUsers } from '../hooks/useUsers';
 import accionPost from '../services/accionPost';
 
+
 const useStyles = makeStyles((theme) => ({
 
   textField: {
@@ -17,29 +18,50 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export function FormRegister({ user = {} }) {
+ 
+  
+  let newUser = true;
 
-  const classes = useStyles();
-  const users = useUsers()
-
-
+  
   const [disabledStatus, setDisabledStatus] = useState(true)
   const [formUser, setFormUser] = useState(user)
-
+  
   const newDisabled = () => {
     setDisabledStatus(!disabledStatus)
   }
-
 
   const managerSubmit = () => {
     let c = 0;
     let p = 0;
     let i = 0;
-    if (formUser.first_name?.length <= 2 || formUser.last_name?.length <= 2 || formUser.email?.length <= 2) {
-      return Swal.fire('Todos los campos  son requeridos y deben  ser mayor  a  2 caracters')
-    } else if (!isNaN(formUser.first_name) || !isNaN(formUser.last_name) || !isNaN(formUser.email)) {
-      return Swal.fire('El campo no puede  ser un numero ')
+
+    
+
+    if(!formUser){
+      return Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'Todos los  campos  son requeridos'
+       
+      })
     }
-    console.log(formUser)
+    if (formUser.first_name?.length <= 2 || formUser.last_name?.length <= 2 || formUser.email?.length <= 2) {
+      return Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'Todos los  campos  son requeridos'
+       
+      })
+    } else if (!isNaN(formUser.first_name) || !isNaN(formUser.last_name) || !isNaN(formUser.email)) {
+    
+    return Swal.fire({
+      icon: 'error',
+      title: 'Oops...',
+      text: 'El campo requerido no debe ser solo numerico'
+     
+    })
+    }
+  
     for (i = 1; i < formUser.email?.length; i++) {
 
       if (formUser.email.charAt(i - 1) == "@") {
@@ -53,18 +75,52 @@ export function FormRegister({ user = {} }) {
     }
     if (c == 1 && p == 1) {
 
-      accionPost(formUser).then(Swal.fire({icon: 'error',
-      title: 'Oops...',
-      text: 'Usuario completado',
-      footer: '<a href>Why do I have this issue?</a>'}))
+      if(user && user.first_name){
+        Swal.fire(
+          {
+            icon: 'success',
+            title: 'usuario editado',
+            showConfirmButton: false,
+            timer: 1500
+          })
+      }else{
+
+         accionPost(formUser).then(Swal.fire(
+        {
+          icon: 'success',
+          title: 'usuario completado',
+          showConfirmButton: false,
+          timer: 1500
+        }))
         .catch(err => console.log(err))
+      } 
 
     } else {
-      return Swal.fire('su  corrreo  no es  valido')
+      return Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'su  correo no es  valido'
+       
+      })
     }
   }
+  
+  if(user?.first_name){
+    newUser = false
+    setTimeout(() => {
+      document.getElementById("btn").style.display="block"
+    }, 0);
+    
+  }
+  if(newUser){
+    setTimeout(()=>{
 
+      setDisabledStatus(false)
 
+    })
+  }
+  
+  
   return (
     <form>
 
@@ -131,13 +187,17 @@ export function FormRegister({ user = {} }) {
           />
         </div>
         <Button onClick={managerSubmit} size="small">Guardar</Button>
-
-        <Button id="btn" size="small" onClick={newDisabled}>Editar</Button>
-
+        <Button  id="btn" size="small" onClick={newDisabled}>Editar</Button>
+      
       </div>
+      
     </form>
 
+)
 
-  )
 
 }
+
+
+
+ 
