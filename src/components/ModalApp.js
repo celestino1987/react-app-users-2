@@ -8,7 +8,7 @@ import { Button } from '@material-ui/core';
 
 Modal.setAppElement('#root');
 
-export const ModalApp = ({isOpen, setOpenModal, selectedUser = {}}) => {
+export const ModalApp = ({isOpen, setOpenModal, selectedUser = {}, changeUsers, loadedUsers}) => {
 
     return (
         <> 
@@ -23,7 +23,7 @@ export const ModalApp = ({isOpen, setOpenModal, selectedUser = {}}) => {
              
         > 
            <Button onClick={() => {setOpenModal(false)}}><CloseOutlinedIcon  /></Button>
-            <FormRegister user={selectedUser}></FormRegister>
+            <FormRegister user={selectedUser} loadedUsers={loadedUsers} setOpenModal={setOpenModal} changeUsers={changeUsers}></FormRegister>
         </Modal>
        
         </>

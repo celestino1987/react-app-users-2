@@ -2,14 +2,16 @@
 import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
-import { Button } from '@material-ui/core';
+import { Button, Modal } from '@material-ui/core';
 import Swal from 'sweetalert2';
 import { useUsers } from '../hooks/useUsers';
 import accionPost from '../services/accionPost';
+import { ModalApp } from './ModalApp';
+
 
 
 const useStyles = makeStyles((theme) => ({
-
+  
   textField: {
     marginLeft: theme.spacing(1),
     marginRight: theme.spacing(1),
@@ -17,94 +19,20 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export function FormRegister({ user = {} }) {
+export function FormRegister({user, selectedUser, loadedUsers, setOpenModal, changeUsers}) {
+  
  
-  
-  let newUser = true;
 
-  
+  let newUser = true;
+  const [formUser, setFormUser] = useState(user || {first_name: '', email: '', last_name: ''})
   const [disabledStatus, setDisabledStatus] = useState(true)
-  const [formUser, setFormUser] = useState(user)
   
+
   const newDisabled = () => {
     setDisabledStatus(!disabledStatus)
   }
 
-  const managerSubmit = () => {
-    let c = 0;
-    let p = 0;
-    let i = 0;
 
-    
-
-    if(!formUser){
-      return Swal.fire({
-        icon: 'error',
-        title: 'Oops...',
-        text: 'Todos los  campos  son requeridos'
-       
-      })
-    }
-    if (formUser.first_name?.length <= 2 || formUser.last_name?.length <= 2 || formUser.email?.length <= 2) {
-      return Swal.fire({
-        icon: 'error',
-        title: 'Oops...',
-        text: 'Todos los  campos  son requeridos'
-       
-      })
-    } else if (!isNaN(formUser.first_name) || !isNaN(formUser.last_name) || !isNaN(formUser.email)) {
-    
-    return Swal.fire({
-      icon: 'error',
-      title: 'Oops...',
-      text: 'El campo requerido no debe ser solo numerico'
-     
-    })
-    }
-  
-    for (i = 1; i < formUser.email?.length; i++) {
-
-      if (formUser.email.charAt(i - 1) == "@") {
-        c++;
-      }
-      if (c == 1) {
-        if (formUser.email.charAt(i - 1) == ".") {
-          p++;
-        }
-      }
-    }
-    if (c == 1 && p == 1) {
-
-      if(user && user.first_name){
-        Swal.fire(
-          {
-            icon: 'success',
-            title: 'usuario editado',
-            showConfirmButton: false,
-            timer: 1500
-          })
-      }else{
-
-         accionPost(formUser).then(Swal.fire(
-        {
-          icon: 'success',
-          title: 'usuario completado',
-          showConfirmButton: false,
-          timer: 1500
-        }))
-        .catch(err => console.log(err))
-      } 
-
-    } else {
-      return Swal.fire({
-        icon: 'error',
-        title: 'Oops...',
-        text: 'su  correo no es  valido'
-       
-      })
-    }
-  }
-  
   if(user?.first_name){
     newUser = false
     setTimeout(() => {
@@ -118,9 +46,92 @@ export function FormRegister({ user = {} }) {
       setDisabledStatus(false)
 
     })
+  }  
+
+  function validationForm  (){
+    let c = 0;
+    let p = 0;
+    let i = 0;
+
+    if (!formUser) {
+        return Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Todos los  campos  son requeridos'
+        })
+    }
+    if (formUser.first_name?.length <= 2 || formUser.last_name?.length <= 2 || formUser.email?.length <= 2) {
+        return Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Todos los  campos  son requeridos'
+
+        })
+    } else if (!isNaN(formUser.first_name) || !isNaN(formUser.last_name) || !isNaN(formUser.email)) {
+
+        return Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'El campo requerido no debe ser solo numerico'
+
+        })
+    }
+
+    for (i = 1; i < formUser.email?.length; i++) {
+
+        if (formUser.email.charAt(i - 1) == "@") {
+            c++;
+        }
+        if (c == 1) {
+            if (formUser.email.charAt(i - 1) == ".") {
+                p++;
+            }
+        }
+    }
+    if (c == 1 && p == 1) {
+    } else {
+        return Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'su  correo no es  valido'
+        })
+    }
+    if (user && user.first_name) {
+        Swal.fire(
+            {
+                icon: 'success',
+                title: 'usuario editado',
+                showConfirmButton: false,
+                timer: 1500
+            })
+         
+            loadedUsers.data[user.idx] = formUser
+
+            loadedUsers.total = loadedUsers.data.length;
+  
+         
+            changeUsers(loadedUsers);
+        // obtener la id del que has cambiado y cambiarlo en el array y después llamar a ChangeUsers
+    } else {
+        <ModalApp  setOpenModal={setOpenModal} />
+
+        accionPost(formUser).then(Swal.fire(
+            {
+                icon: 'success',
+                title: 'usuario completado',
+                showConfirmButton: false,
+                timer: 1500
+            }))
+       
+        loadedUsers.data.push({ ...formUser, id: loadedUsers.data.length + 1 })
+        loadedUsers.total = loadedUsers.data.length;
+       console.log( loadedUsers.data)
+
+        changeUsers(loadedUsers);
+        
+    }
+
   }
-  
-  
   return (
     <form>
 
@@ -186,7 +197,7 @@ export function FormRegister({ user = {} }) {
             }}
           />
         </div>
-        <Button onClick={managerSubmit} size="small">Guardar</Button>
+        <Button onClick={() => {validationForm(); setOpenModal(false) }}size="small">Guardar</Button>
         <Button  id="btn" size="small" onClick={newDisabled}>Editar</Button>
       
       </div>

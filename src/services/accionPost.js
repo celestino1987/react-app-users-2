@@ -9,8 +9,6 @@ export default function accionPost(formUser) {
         method: 'POST',
         url: url,
         data: formUser
-    }).then(res => console.log(res.data))
-        .catch(err => console.log(err))
-
+    })
 }
 

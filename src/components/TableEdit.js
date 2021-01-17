@@ -9,14 +9,11 @@ import TableHead from '@material-ui/core/TableHead';
 import TablePagination from '@material-ui/core/TablePagination';
 import TableRow from '@material-ui/core/TableRow';
 import { useUsers } from '../hooks/useUsers';
-
-import {  useHistory } from "react-router-dom";
-
 import { ModalApp } from './ModalApp';
 import { getSort } from '../services/getSort';
-import { AddButton } from './AddButton';
 import { Button } from '@material-ui/core';
 import PersonAddIcon from '@material-ui/icons/PersonAdd';
+
 
 const ASC = 'asc';
 const DESC = 'desc'
@@ -40,29 +37,35 @@ const [order, setOrder] = useState(ASC)
 const [isOpen, setOpenModal] = useState(false);
 const [selectedUser, setSelectedUser] = useState({})
 
-
-
-  const users = useUsers()   
-  useEffect(() => {
+const [users,setUsers] = useUsers()   
+useEffect(() => {
+    
     setState({ users: users.data, copyUsers: users.data });
-
-}, [users.data])
+}, [])
   const classes = useStyles();
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
   
 
-  const handleChangePage = (event, newPage) => {
+  const handleChangePage = (newPage) => {
     setPage(newPage);
   };
 
   const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(+event.target.value);
+    setRowsPerPage(event.target.value);
     setPage(0);
   };
 
-
+  
+  const changeUsers = (newUsers) => {
+    
+    newUsers.tal = newUsers.data.length 
+    setState({ users: newUsers.data, copyUsers: newUsers.data });
+    setUsers(newUsers)
+   
+  }
+   
   function sortColumn(column) {
     setOrder(order === ASC ? DESC : ASC)
     setState({...state, users: getSort(state.users,column, order)})
@@ -89,9 +92,9 @@ const [selectedUser, setSelectedUser] = useState({})
             </TableRow>
           </TableHead>
           <TableBody>     
-                {users.data?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(user => (
-                           
-                  <TableRow  className="cursor" key={user.id}  onClick={() => {setOpenModal(true); setSelectedUser(user)}}  >
+                {users.data?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((user,idx)  => (
+                    
+                  <TableRow  className="cursor" key={user.id}  onClick={() => {setOpenModal(true); setSelectedUser({...user, idx});}}  >
                       <TableCell>{user.id}</TableCell>
                       <TableCell>{user.first_name}</TableCell>
                       <TableCell>{user.last_name}</TableCell>                  
@@ -106,14 +109,14 @@ const [selectedUser, setSelectedUser] = useState({})
       <TablePagination
         rowsPerPageOptions={[5, 10, 15]}
         component='div'
-        count={users.data?.length}
-        rowsPerPage={rowsPerPage}
-        page={page}
+        count={users.data?.length || 0 }
+        rowsPerPage={rowsPerPage || 10}
+        page={page || 0}
         onChangePage={handleChangePage}
         onChangeRowsPerPage={handleChangeRowsPerPage}
       />
     </Paper>
-    <ModalApp isOpen={isOpen} setOpenModal={setOpenModal} selectedUser={selectedUser}></ModalApp>
+    <ModalApp isOpen={isOpen} setOpenModal={setOpenModal} selectedUser={selectedUser} changeUsers={changeUsers} loadedUsers={users}></ModalApp>
     </div>
 
   );
